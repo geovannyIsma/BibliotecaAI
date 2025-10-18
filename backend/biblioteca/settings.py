@@ -58,6 +58,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 # CORS settings
@@ -66,6 +67,15 @@ CORS_ALLOW_ALL_ORIGINS = os.environ.get('CORS_ALLOW_ALL_ORIGINS', 'True').lower(
 # Filter out empty strings from CORS_ALLOWED_ORIGINS
 cors_origins = os.environ.get('CORS_ALLOWED_ORIGINS', '')
 CORS_ALLOWED_ORIGINS = [origin for origin in cors_origins.split(',') if origin.strip()]
+
+# ... al final de tu archivo settings.py ...
+
+# Configuración para confiar en los orígenes de Azure para formularios (login admin)
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.azurewebsites.net',
+    'https://bibliotecaai.azurewebsites.net',
+    'https://bibliotecaai-dwc6dkcjgfb7cgah.eastus-01.azurewebsites.net'
+]
 
 ROOT_URLCONF = 'biblioteca.urls'
 
@@ -138,6 +148,8 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
