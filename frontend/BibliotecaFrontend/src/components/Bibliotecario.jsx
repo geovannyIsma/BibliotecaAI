@@ -54,7 +54,7 @@ const Librarian = ({ onSearchResults }) => {
       <div className="relative w-full flex justify-center mb-12">
         <div className="w-50 h-50 bg-gray-300 rounded-full">
           <img 
-            src="/src/assets/bibliotecario.png" 
+            src="/bibliotecario.png" 
             alt="Bibliotecario" 
             className="w-full h-full object-cover rounded-full"
             onError={(e) => {
