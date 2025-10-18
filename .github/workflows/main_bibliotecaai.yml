@@ -61,5 +61,6 @@ jobs:
         with:
           app-name: 'BibliotecaAI'
           slot-name: 'Production'
-          package: './python-app'
+          package: 'python-app/backend'
+
 
