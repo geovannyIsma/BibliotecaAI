@@ -40,19 +40,31 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col">
+    <div className="min-h-screen biblioteca-container flex flex-col">
       <Navbar onFilterChange={handleFilterChange} />
       
       <main className="container mx-auto p-4 flex-grow">
-        <Librarian onSearchResults={handleSearchResults} />
+        <div className="bg-amber-50 rounded-lg shadow-md p-6 mb-8 library-desk">
+          <Librarian onSearchResults={handleSearchResults} />
+        </div>
         
-        {loading ? (
-          <div className="flex justify-center mt-8">
-            <LoadingSpinner />
-          </div>
-        ) : (
-          <BookGrid books={books} />
-        )}
+        <div className="mt-6 relative">
+          {/* Estantería superior */}
+          <div className="h-4 library-shelf rounded-t-lg mb-1"></div>
+          
+          {loading ? (
+            <div className="flex justify-center mt-8 p-12 bg-amber-50 rounded-lg shadow-md">
+              <LoadingSpinner />
+            </div>
+          ) : (
+            <div className="bg-amber-50 rounded-lg p-6 shadow-md">
+              <BookGrid books={books} />
+            </div>
+          )}
+          
+          {/* Estantería inferior */}
+          <div className="h-4 library-shelf rounded-b-lg mt-1"></div>
+        </div>
       </main>
       
       <Footer />

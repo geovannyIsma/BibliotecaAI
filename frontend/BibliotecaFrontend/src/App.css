@@ -1,0 +1,116 @@
+/* Estilos globales para la biblioteca */
+body {
+  font-family: 'Libre Baskerville', 'Georgia', serif;
+  background-color: #f8f5f0;
+  color: #3a3a3a;
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23decaa4' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* Contenedor principal con textura de madera */
+.biblioteca-container {
+  background-color: #f8f5f0;
+  background-image: url("data:image/svg+xml,%3Csvg width='42' height='44' viewBox='0 0 42 44' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c19a6b' fill-opacity='0.05'%3E%3Cpath d='M0 0h42v44H0V0zm1 1h40v20H1V1zM0 23h20v20H0V23zm22 0h20v20H22V23z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+.book-title {
+  font-family: 'Libre Baskerville', 'Georgia', serif;
+  font-weight: 600;
+}
+
+.book-spine {
+  box-shadow: -2px 2px 5px rgba(0, 0, 0, 0.2);
+  transform: perspective(800px) rotateY(5deg);
+  transition: transform 0.3s ease;
+}
+
+.book-spine:hover {
+  transform: perspective(800px) rotateY(0deg) translateY(-5px);
+}
+
+.library-shelf {
+  background-image: linear-gradient(to bottom, #8b5e34, #6e4423);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.library-desk {
+  background-image: linear-gradient(to bottom, #9e7e55, #8b5e34);
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #e6ddd1;
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #8b5e34;
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #6e4423;
+}
+
+.librarian-chat {
+  background-image: url("data:image/svg+xml,%3Csvg width='64' height='64' viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d9c7a8' fill-opacity='0.2'%3E%3Cpath d='M8 16c4.418 0 8-3.582 8-8s-3.582-8-8-8-8 3.582-8 8 3.582 8 8 8zm0-2c3.314 0 6-2.686 6-6s-2.686-6-6-6-6 2.686-6 6 2.686 6 6 6zm24 16c4.418 0 8-3.582 8-8s-3.582-8-8-8-8 3.582-8 8 3.582 8 8 8zm0-2c3.314 0 6-2.686 6-6s-2.686-6-6-6-6 2.686-6 6 2.686 6 6 6zm24 16c4.418 0 8-3.582 8-8s-3.582-8-8-8-8 3.582-8 8 3.582 8 8 8zm0-2c3.314 0 6-2.686 6-6s-2.686-6-6-6-6 2.686-6 6 2.686 6 6 6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+.page-turn-animation {
+  animation: pageTurn 0.8s ease-in-out;
+}
+
+@keyframes pageTurn {
+  0% {
+    transform: rotateY(0deg);
+    opacity: 0;
+  }
+  50% {
+    transform: rotateY(90deg);
+    opacity: 0.5;
+  }
+  100% {
+    transform: rotateY(0deg);
+    opacity: 1;
+  }
+}
+
+.library-title {
+  font-family: 'Playfair Display', 'Times New Roman', serif;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Nuevos estilos para las portadas de libros */
+.book-cover {
+  position: relative;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+}
+
+.book-cover::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 10px;
+  background: linear-gradient(to right, rgba(0,0,0,0.05), rgba(0,0,0,0.15));
+  border-left: 1px solid rgba(0,0,0,0.1);
+}
+
+.book-cover:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.book-hover-effect {
+  transition: all 0.3s ease;
+}
+
+.book-hover-effect:hover {
+  transform: scale(1.03) translateY(-5px);
+}
