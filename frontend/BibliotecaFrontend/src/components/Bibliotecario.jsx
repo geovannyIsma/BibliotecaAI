@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { enviarConsulta, buscarLibros } from '../services/api';
 
 const Librarian = ({ onSearchResults }) => {
@@ -10,24 +10,59 @@ const Librarian = ({ onSearchResults }) => {
     "¿Puedes recomendarme un libro de historia?"
   ]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
+  const [conversationHistory, setConversationHistory] = useState([
+    { role: 'bibliotecario', content: '¡Hola! Soy tu bibliotecario virtual. ¿En qué puedo ayudarte hoy?' }
+  ]);
+  
+  const messageEndRef = useRef(null);
+  const inputRef = useRef(null);
+  
+  // Efecto de escritura
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsTyping(false);
+    }, 1000);
+    
+    return () => clearTimeout(timer);
+  }, [isTyping]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!query.trim()) return;
-
+    
+    // Agregar la consulta del usuario a la conversación
+    const userMessage = query;
+    setConversationHistory(prev => [
+      ...prev, 
+      { role: 'usuario', content: userMessage }
+    ]);
+    
+    // Mostrar efecto de escritura
+    setIsTyping(true);
     setIsLoading(true);
+    setQuery('');
+    
     try {
       // Buscar libros con la consulta
-      const resultados = await buscarLibros(query);
+      const resultados = await buscarLibros(userMessage);
       
-      // Actualizar el mensaje del bibliotecario y sugerencias
+      let respuesta = '';
+      
+      // Crear respuesta basada en los resultados
       if (resultados.explicacion) {
-        setMessage(resultados.explicacion);
+        respuesta = resultados.explicacion;
       } else if (resultados.libros && resultados.libros.length > 0) {
-        setMessage(`He encontrado ${resultados.libros.length} libros que podrían interesarte.`);
+        respuesta = `He encontrado ${resultados.libros.length} libros que podrían interesarte.`;
       } else {
-        setMessage("No he encontrado libros que coincidan con tu búsqueda. ¿Puedo ayudarte con algo más?");
+        respuesta = "No he encontrado libros que coincidan con tu búsqueda. ¿Puedo ayudarte con algo más?";
       }
+      
+      // Actualizar la conversación con la respuesta del bibliotecario
+      setConversationHistory(prev => [
+        ...prev,
+        { role: 'bibliotecario', content: respuesta }
+      ]);
       
       // Actualizar sugerencias si existen
       if (resultados.sugerencias && resultados.sugerencias.length > 0) {
@@ -38,71 +73,116 @@ const Librarian = ({ onSearchResults }) => {
       onSearchResults(resultados);
     } catch (error) {
       console.error('Error:', error);
-      setMessage('Lo siento, ha ocurrido un error al procesar tu consulta.');
+      
+      setConversationHistory(prev => [
+        ...prev,
+        { role: 'bibliotecario', content: 'Lo siento, ha ocurrido un error al procesar tu consulta. ¿Podrías intentarlo nuevamente?' }
+      ]);
     } finally {
       setIsLoading(false);
-      setQuery('');
     }
   };
 
   const handleSuggestionClick = (suggestion) => {
     setQuery(suggestion);
+    inputRef.current?.focus();
   };
 
   return (
-    <div className="flex flex-col items-center justify-center w-full max-w-4xl mx-auto">
-      <div className="relative w-full flex justify-center mb-12">
-        <div className="w-50 h-50 bg-gray-300 rounded-full">
-          <img 
-            src="/bibliotecario.png" 
-            alt="Bibliotecario" 
-            className="w-full h-full object-cover rounded-full"
-            onError={(e) => {
-              e.target.onerror = null;
-              e.target.src = "https://placehold.co/200x200?text=Bibliotecario";
-            }}
-          />
-        </div>
-        <div className="absolute -top-8 left-1/2 transform translate-x-32 bg-white border-2 border-black rounded-lg p-5 w-[550px] min-h-[150px] shadow-lg">
-          <div className="text-base leading-relaxed max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
-            {isLoading ? "Pensando..." : message}
+    <div className="flex flex-col items-center w-full max-w-4xl mx-auto rounded-xl bg-white shadow-md p-6 animate-fadeIn">
+      <div className="w-full mb-4">
+        <div className="flex items-center mb-4">
+          <div className="w-12 h-12 bg-blue-100 rounded-full flex-shrink-0 overflow-hidden">
+            <img 
+              src="/bibliotecario.png" 
+              alt="Bibliotecario" 
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = "https://placehold.co/100?text=B";
+              }}
+            />
           </div>
-          
-          {!isLoading && suggestions && suggestions.length > 0 && (
-            <div className="mt-4 border-t pt-3">
-              <p className="font-medium text-sm text-gray-600 mb-2">Sugerencias:</p>
-              <div className="flex flex-wrap gap-2">
-                {suggestions.map((suggestion, index) => (
-                  <button 
-                    key={index}
-                    onClick={() => handleSuggestionClick(suggestion)}
-                    className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs hover:bg-blue-200 transition-colors flex items-center"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                    {suggestion}
-                  </button>
-                ))}
+          <div className="ml-3">
+            <h2 className="font-medium text-lg">Bibliotecario Virtual</h2>
+            <p className="text-sm text-gray-500">Siempre disponible para ayudarte</p>
+          </div>
+          <div className="ml-auto">
+            <span className={`inline-flex h-3 w-3 rounded-full ${isTyping ? 'bg-green-400' : 'bg-green-300'}`}></span>
+          </div>
+        </div>
+        
+        <div className="bg-gray-50 rounded-lg p-4 h-64 overflow-y-auto custom-scrollbar mb-4">
+          {conversationHistory.map((message, index) => (
+            <div 
+              key={index} 
+              className={`mb-3 ${message.role === 'usuario' ? 'text-right' : ''}`}
+            >
+              <div 
+                className={`inline-block max-w-[80%] px-4 py-2 rounded-lg ${
+                  message.role === 'usuario' 
+                    ? 'bg-blue-100 text-blue-900' 
+                    : 'bg-white border border-gray-200 text-gray-800'
+                }`}
+              >
+                <p className="text-sm">{message.content}</p>
               </div>
             </div>
-          )}    
+          ))}
+          
+          {isTyping && (
+            <div className="mb-3">
+              <div className="inline-block max-w-[80%] px-4 py-2 rounded-lg bg-white border border-gray-200">
+                <div className="flex space-x-1">
+                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                </div>
+              </div>
+            </div>
+          )}
+          
+          <div ref={messageEndRef} />
         </div>
+        
+        {!isLoading && suggestions && suggestions.length > 0 && (
+          <div className="mb-4">
+            <p className="text-xs font-medium text-gray-600 mb-2">Sugerencias:</p>
+            <div className="flex flex-wrap gap-2">
+              {suggestions.map((suggestion, index) => (
+                <button 
+                  key={index}
+                  onClick={() => handleSuggestionClick(suggestion)}
+                  className="bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs transition-colors flex items-center"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6z" />
+                  </svg>
+                  {suggestion}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
-      <form onSubmit={handleSubmit} className="w-full max-w-2xl mt-40">
-        <div className="flex items-center border-2 rounded-lg overflow-hidden">
+      <form onSubmit={handleSubmit} className="w-full">
+        <div className="flex items-center border rounded-lg overflow-hidden bg-white shadow-sm focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 transition-all">
           <input
             type="text"
+            ref={inputRef}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="¿Qué libro estás buscando?"
             className="flex-grow px-4 py-3 focus:outline-none text-base"
+            disabled={isLoading}
+            aria-label="Consulta al bibliotecario"
           />
           <button
             type="submit"
-            disabled={isLoading}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 disabled:bg-blue-300 flex items-center"
+            disabled={isLoading || !query.trim()}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 transition-colors disabled:bg-blue-300 flex items-center"
+            aria-label="Enviar consulta"
           >
             {isLoading ? (
               <>
@@ -115,13 +195,16 @@ const Librarian = ({ onSearchResults }) => {
             ) : (
               <>
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
                 </svg>
-                Buscar
+                Enviar
               </>
             )}
           </button>
         </div>
+        <p className="text-xs text-gray-500 mt-2">
+          Escribe tu consulta o selecciona una sugerencia para comenzar
+        </p>
       </form>
     </div>
   );

@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import './App.css';
 import Librarian from './components/Bibliotecario';
 import BookGrid from './components/Libros';
+import Footer from './components/Footer';
+import Navbar from './components/Navbar';
+import LoadingSpinner from './components/LoadingSpinner';
 import { fetchLibros } from './services/api';
 
 function App() {
@@ -31,26 +34,22 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4">
-      <header className="mb-8 text-center">
-        <h1 className="text-3xl font-bold">Biblioteca Virtual</h1>
-      </header>
+    <div className="min-h-screen bg-gray-100 flex flex-col">
+      <Navbar />
       
-      <main className="container mx-auto pb-8">
+      <main className="container mx-auto p-4 flex-grow">
         <Librarian onSearchResults={handleSearchResults} />
         
         {loading ? (
           <div className="flex justify-center mt-8">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+            <LoadingSpinner />
           </div>
         ) : (
           <BookGrid books={books} />
         )}
       </main>
       
-      <footer className="text-center text-gray-500 text-sm mt-8">
-        Biblioteca Virtual
-      </footer>
+      <Footer />
     </div>
   );
 }
