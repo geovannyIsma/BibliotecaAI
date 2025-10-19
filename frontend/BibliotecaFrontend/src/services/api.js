@@ -1,11 +1,18 @@
 const API_URL = 'http://localhost:8000/api';
 //import.meta.env.VITE_API_URL;
 
-export const fetchLibros = async (query = '') => {
+export const fetchLibros = async (params = {}) => {
   try {
-    const url = query 
-      ? `${API_URL}/libros/?q=${encodeURIComponent(query)}`
-      : `${API_URL}/libros/`;
+    // Construir la URL con parámetros de consulta
+    const queryParams = new URLSearchParams();
+    
+    if (params.query) queryParams.append('q', params.query);
+    if (params.categoria) queryParams.append('categoria', params.categoria);
+    if (params.disponible !== undefined) queryParams.append('disponible', params.disponible);
+    if (params.fecha_desde) queryParams.append('fecha_desde', params.fecha_desde);
+    if (params.fecha_hasta) queryParams.append('fecha_hasta', params.fecha_hasta);
+    
+    const url = `${API_URL}/libros/?${queryParams.toString()}`;
     const response = await fetch(url);
     return await response.json();
   } catch (error) {

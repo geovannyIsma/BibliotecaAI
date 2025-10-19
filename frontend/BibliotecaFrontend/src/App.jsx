@@ -10,22 +10,24 @@ import { fetchLibros } from './services/api';
 function App() {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [filterParams, setFilterParams] = useState({});
+
+  const loadBooks = async (params = {}) => {
+    setLoading(true);
+    try {
+      const response = await fetchLibros(params);
+      setBooks(response.results || []);
+    } catch (error) {
+      console.error('Error loading books:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const loadInitialBooks = async () => {
-      setLoading(true);
-      try {
-        const response = await fetchLibros();
-        setBooks(response.results || []);
-      } catch (error) {
-        console.error('Error loading initial books:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadInitialBooks();
-  }, []);
+    // Cargar libros iniciales
+    loadBooks(filterParams);
+  }, [filterParams]);
 
   const handleSearchResults = (results) => {
     if (results && results.libros) {
@@ -33,9 +35,13 @@ function App() {
     }
   };
 
+  const handleFilterChange = (newFilters) => {
+    setFilterParams({ ...filterParams, ...newFilters });
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col">
-      <Navbar />
+      <Navbar onFilterChange={handleFilterChange} />
       
       <main className="container mx-auto p-4 flex-grow">
         <Librarian onSearchResults={handleSearchResults} />

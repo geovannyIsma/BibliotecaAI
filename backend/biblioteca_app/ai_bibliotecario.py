@@ -17,7 +17,8 @@ class BibliotecarioIA:
             
             # Crear contexto con información de la biblioteca
             contexto_libros = "\n".join([
-                f"Libro: {libro.titulo}, Autor: {libro.autor}, Categoría: {libro.categoria.nombre if libro.categoria else 'Sin categoría'}"
+                f"Libro: {libro.titulo}, Autor: {libro.autor}, Categoría: {libro.categoria.nombre if libro.categoria else 'Sin categoría'}, " +
+                f"Disponible: {'Sí' if libro.disponible else 'No'}, Fecha de ingreso: {libro.fecha_creacion.strftime('%Y-%m-%d')}"
                 for libro in libros[:20] # Limitar a los primeros 20 libros para no exceder el límite de tokens
             ])
             
@@ -44,6 +45,8 @@ class BibliotecarioIA:
             
             Si la consulta es una pregunta general sobre la biblioteca o cómo usarla, responde con formato JSON:
             {{"tipo": "informacion", "respuesta": "tu respuesta detallada aquí"}}
+            
+            Responde basándote únicamente en la información proporcionada arriba a menos que la consulta explícitamente pida otra cosa.
             
             IMPORTANTE: Responde únicamente con el JSON, sin formato markdown, sin backticks, y sin texto adicional.
             """

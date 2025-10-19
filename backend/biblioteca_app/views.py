@@ -34,10 +34,13 @@ class LibroViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
     
     def get_queryset(self):
-        """Permite búsquedas simples por título, autor o categoría"""
+        """Permite búsquedas simples por título, autor, categoría, disponibilidad o fecha"""
         queryset = Libro.objects.all()
         query = self.request.query_params.get('q')
         categoria = self.request.query_params.get('categoria')
+        disponible = self.request.query_params.get('disponible')
+        fecha_desde = self.request.query_params.get('fecha_desde')
+        fecha_hasta = self.request.query_params.get('fecha_hasta')
         
         if query:
             queryset = queryset.filter(
@@ -48,6 +51,16 @@ class LibroViewSet(viewsets.ModelViewSet):
             
         if categoria:
             queryset = queryset.filter(categoria__nombre__icontains=categoria)
+            
+        if disponible is not None:
+            is_disponible = disponible.lower() == 'true'
+            queryset = queryset.filter(disponible=is_disponible)
+            
+        if fecha_desde:
+            queryset = queryset.filter(fecha_creacion__gte=fecha_desde)
+            
+        if fecha_hasta:
+            queryset = queryset.filter(fecha_creacion__lte=fecha_hasta)
             
         return queryset
 

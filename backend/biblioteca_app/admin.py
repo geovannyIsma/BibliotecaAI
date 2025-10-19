@@ -3,9 +3,9 @@ from .models import Libro, Categoria, Consulta
 
 @admin.register(Libro)
 class LibroAdmin(admin.ModelAdmin):
-    list_display = ('titulo', 'autor', 'isbn', 'categoria')
+    list_display = ('titulo', 'autor', 'isbn', 'categoria', 'disponible', 'fecha_creacion')
     search_fields = ('titulo', 'autor', 'isbn')
-    list_filter = ('categoria',)
+    list_filter = ('categoria', 'disponible', 'fecha_creacion')
 
 @admin.register(Categoria)
 class CategoriaAdmin(admin.ModelAdmin):
