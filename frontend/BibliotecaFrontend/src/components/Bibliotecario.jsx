@@ -18,15 +18,6 @@ const Librarian = ({ onSearchResults }) => {
   const messageEndRef = useRef(null);
   const inputRef = useRef(null);
   
-  // Efecto de escritura
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsTyping(false);
-    }, 1000);
-    
-    return () => clearTimeout(timer);
-  }, [isTyping]);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!query.trim()) return;
@@ -38,7 +29,7 @@ const Librarian = ({ onSearchResults }) => {
       { role: 'usuario', content: userMessage }
     ]);
     
-    // Mostrar efecto de escritura
+    // Mostrar efecto de escritura y establecer estado de carga
     setIsTyping(true);
     setIsLoading(true);
     setQuery('');
@@ -55,31 +46,45 @@ const Librarian = ({ onSearchResults }) => {
       } else if (resultados.libros && resultados.libros.length > 0) {
         respuesta = `He encontrado ${resultados.libros.length} libros que podrían interesarte.`;
       } else {
-        respuesta = "No he encontrado libros que coincidan con tu búsqueda. ¿Puedo ayudarte con algo más?";
+        respuesta = "No he encontrado libros que coincidan con tu búsqueda. Seguiré mostrando el catálogo completo para que puedas explorar.";
       }
       
-      // Actualizar la conversación con la respuesta del bibliotecario
-      setConversationHistory(prev => [
-        ...prev,
-        { role: 'bibliotecario', content: respuesta }
-      ]);
+      // Simular el tiempo de escritura antes de mostrar la respuesta completa
+      // para que se vea más natural, especialmente con respuestas largas
+      setTimeout(() => {
+        // Actualizar la conversación con la respuesta del bibliotecario
+        setConversationHistory(prev => [
+          ...prev,
+          { role: 'bibliotecario', content: respuesta }
+        ]);
+        
+        // Actualizar sugerencias si existen
+        if (resultados.sugerencias && resultados.sugerencias.length > 0) {
+          setSuggestions(resultados.sugerencias);
+        }
+        
+        // Pasar los resultados al componente padre
+        onSearchResults(resultados);
+        
+        // Finalizar estados de carga y escritura
+        setIsTyping(false);
+        setIsLoading(false);
+      }, 800); // Añadimos un retraso para simular el tiempo de escritura
       
-      // Actualizar sugerencias si existen
-      if (resultados.sugerencias && resultados.sugerencias.length > 0) {
-        setSuggestions(resultados.sugerencias);
-      }
-      
-      // Pasar los resultados al componente padre
-      onSearchResults(resultados);
     } catch (error) {
       console.error('Error:', error);
       
-      setConversationHistory(prev => [
-        ...prev,
-        { role: 'bibliotecario', content: 'Lo siento, ha ocurrido un error al procesar tu consulta. ¿Podrías intentarlo nuevamente?' }
-      ]);
-    } finally {
-      setIsLoading(false);
+      // En caso de error, también simulamos el tiempo de escritura
+      setTimeout(() => {
+        setConversationHistory(prev => [
+          ...prev,
+          { role: 'bibliotecario', content: 'Lo siento, ha ocurrido un error al procesar tu consulta. ¿Podrías intentarlo nuevamente?' }
+        ]);
+        
+        // Finalizar estados de carga y escritura
+        setIsTyping(false);
+        setIsLoading(false);
+      }, 800);
     }
   };
 

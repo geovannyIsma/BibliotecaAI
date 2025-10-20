@@ -11,12 +11,14 @@ function App() {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(false);
   const [filterParams, setFilterParams] = useState({});
+  const [noResultsMessage, setNoResultsMessage] = useState('');
 
   const loadBooks = async (params = {}) => {
     setLoading(true);
     try {
       const response = await fetchLibros(params);
       setBooks(response.results || []);
+      setNoResultsMessage('');
     } catch (error) {
       console.error('Error loading books:', error);
     } finally {
@@ -30,13 +32,19 @@ function App() {
   }, [filterParams]);
 
   const handleSearchResults = (results) => {
-    if (results && results.libros) {
+    // Solo actualizar los libros si hay resultados
+    if (results && results.libros && results.libros.length > 0) {
       setBooks(results.libros);
+      setNoResultsMessage('');
+    } else if (results && results.libros && results.libros.length === 0) {
+      // Mostrar mensaje pero mantener los libros actuales
+      setNoResultsMessage('No se encontraron libros que coincidan con tu búsqueda, mostrando catálogo completo.');
     }
   };
 
   const handleFilterChange = (newFilters) => {
     setFilterParams({ ...filterParams, ...newFilters });
+    setNoResultsMessage('');
   };
 
   return (
@@ -58,6 +66,11 @@ function App() {
             </div>
           ) : (
             <div className="bg-amber-50 rounded-lg p-6 shadow-md">
+              {noResultsMessage && (
+                <div className="mb-4 p-3 bg-amber-100 border border-amber-300 rounded-lg text-amber-800">
+                  {noResultsMessage}
+                </div>
+              )}
               <BookGrid books={books} />
             </div>
           )}
