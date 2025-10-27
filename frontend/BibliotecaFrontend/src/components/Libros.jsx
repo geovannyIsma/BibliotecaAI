@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { reservarLibro, devolverLibro, consultarDisponibilidad } from '../services/api';
 import ReservaModal from './ReservaModal';
 
 const BookCard = ({ book, onReservaChange }) => {
