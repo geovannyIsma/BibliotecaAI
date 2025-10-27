@@ -17,7 +17,7 @@ function App() {
     setLoading(true);
     try {
       const response = await fetchLibros(params);
-      setBooks(response.results || []);
+      setBooks(response.results || response || []);
       setNoResultsMessage('');
     } catch (error) {
       console.error('Error loading books:', error);
@@ -29,7 +29,7 @@ function App() {
   useEffect(() => {
     // Cargar libros iniciales
     loadBooks(filterParams);
-  }, [filterParams]);
+  }, []);
 
   const handleSearchResults = (results) => {
     // Solo actualizar los libros si hay resultados
@@ -43,8 +43,15 @@ function App() {
   };
 
   const handleFilterChange = (newFilters) => {
-    setFilterParams({ ...filterParams, ...newFilters });
+    const newParams = { ...filterParams, ...newFilters };
+    setFilterParams(newParams);
     setNoResultsMessage('');
+    loadBooks(newParams);
+  };
+
+  const handleReservaChange = async () => {
+    // Recargar libros cuando haya cambios en reservas
+    await loadBooks(filterParams);
   };
 
   return (
@@ -71,7 +78,7 @@ function App() {
                   {noResultsMessage}
                 </div>
               )}
-              <BookGrid books={books} />
+              <BookGrid books={books} onReservaChange={handleReservaChange} />
             </div>
           )}
           
